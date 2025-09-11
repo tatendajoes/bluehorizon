@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useActions } from "../../contexts/ActionContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 // --- Types ---
 export type ChatMessage = {
@@ -86,65 +87,50 @@ export default function YourChatComponent() {
   }, [isChatOpen]);
 
   return (
-    <div className="bg-white rounded-lg shadow p-3 overflow-hidden">
-      {/* Chat Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">AI Assistant</h3>
-          <ConnectionDot status={connection} />
-        </div>
-        <ChatTriggerButton 
-          unread={unread} 
-          isOpen={isChatOpen} 
-          onToggle={() => { 
-            setIsChatOpen(!isChatOpen); 
-            if (!isChatOpen) setUnread(0); 
-          }} 
-        />
-      </div>
-
+    <>
       {/* Chat Content Preview */}
-      <div className="h-32 bg-gray-50 rounded-lg p-4">
-        {isChatOpen ? (
-          <div className="h-full flex items-center justify-center">
-            <p className="text-gray-500 text-sm">Chat panel is open</p>
-          </div>
-        ) : (
-          <div className="h-full flex flex-col justify-center">
-            <p className="text-gray-500 text-sm mb-3 text-center">Quick questions you can ask:</p>
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                "What's the current water quality?",
-                "Any issues detected?",
-                "How's the pH level?",
-                "Export today's data"
-              ].map((question, index) => (
-                <button
-                  key={index}
-                  onClick={() => {
-                    setIsChatOpen(true);
-                    // Store the question to populate chat input
-                    sessionStorage.setItem('pendingQuestion', question);
-                  }}
-                  className="px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-full border border-blue-200 hover:bg-blue-100 hover:border-blue-300 transition-colors cursor-pointer"
-                >
-                  {question}
-                </button>
-              ))}
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-3 overflow-hidden text-gray-700 dark:bg-white/5 dark:backdrop-blur-md dark:border-white/10 dark:shadow-lg dark:text-gray-300">
+        <div className="bg-gray-100 rounded-lg p-4 dark:bg-black/20">
+          {isChatOpen ? (
+            <div className="h-full flex items-center justify-center">
+              <p className="text-gray-500 text-sm dark:text-gray-400">Chat panel is open</p>
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="h-full flex flex-col justify-center">
+              {/* <p className="text-gray-400 text-sm mb-3 text-center">Quick questions you can ask:</p> */}
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  "Any issues detected?",
+                  "Export today's data",
+                  "How's the pH trend?"
+                ].map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setIsChatOpen(true);
+                      // Store the question to populate chat input
+                      sessionStorage.setItem('pendingQuestion', question);
+                    }}
+                    className="px-3 py-1.5 text-xs bg-sky-100 text-sky-800 rounded-full border border-sky-200 hover:bg-sky-200 transition-colors cursor-pointer dark:bg-sky-500/10 dark:text-sky-300 dark:border-sky-500/20 dark:hover:bg-sky-500/20"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Chat Sheet */}
-      <ChatSheet 
-        isOpen={isChatOpen} 
-        onClose={() => setIsChatOpen(false)} 
-        deviceId={deviceId} 
-        setUnread={setUnread} 
-        setConnection={setConnection} 
+      {/* Chat Sheet - Rendered outside the preview container */}
+      <ChatSheet
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        deviceId={deviceId}
+        setUnread={setUnread}
+        setConnection={setConnection}
       />
-    </div>
+    </>
   );
 }
 
@@ -177,6 +163,7 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
   const [streaming, setStreaming] = useState(false);
   const [input, setInput] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
 
   // Load history when opened
   useEffect(() => {
@@ -267,15 +254,15 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
       <aside
         role="dialog"
         aria-modal="true"
-        className={`fixed right-0 top-0 z-50 h-screen w-[25vw] min-w-[320px] max-w-[520px] border-l border-gray-200 bg-white shadow-xl transition-all duration-250 ease-out ${
+        className={`fixed right-0 top-0 z-50 h-[90vh] w-full sm:w-[90vw] md:w-[60vw] lg:w-[40vw] xl:w-[25vw] min-w-[320px] max-w-[520px] border-l border-gray-200 bg-white/80 backdrop-blur-xl shadow-2xl transition-all duration-250 ease-out dark:border-white/10 dark:bg-gray-900/80 ${
           isOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0 pointer-events-none"
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-2 border-b border-gray-200 px-4 py-3">
+        <div className="flex items-center justify-between gap-2 border-b border-gray-200 px-4 py-3 dark:border-white/10">
           <div className="flex items-center gap-2">
-            <span className="text-base font-semibold">Chat</span>
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{deviceId}</span>
+            <span className="text-base font-semibold text-gray-800 dark:text-gray-100">Chat</span>
+            <span className="rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">{deviceId}</span>
           </div>
           <div className="flex items-center gap-1.5">
             {/* Refresh */}
@@ -294,9 +281,9 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
         </div>
 
         {/* Messages */}
-        <div ref={listRef} className="flex h-[calc(100vh-8rem)] flex-col gap-3 overflow-y-auto px-4 py-3">
+        <div ref={listRef} className="flex h-[calc(90vh-8rem)] flex-col gap-3 overflow-y-auto px-4 py-3">
           {loading ? (
-            <div className="text-sm text-gray-500">Loading history…</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">Loading history…</div>
           ) : messages.length === 0 ? (
             <ChatEmptyState onPick={(t) => setInput(t)} />
           ) : (
@@ -306,14 +293,14 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
         </div>
 
         {/* Composer */}
-        <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white/80 p-3 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white/80 p-3 backdrop-blur-sm dark:border-white/10 dark:bg-gray-900/80">
           <div className="flex items-end gap-2">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               rows={1}
               placeholder="Message…"
-              className="max-h-28 flex-1 resize-none rounded-xl border border-gray-300 bg-white p-2.5 text-sm outline-none ring-0 focus:border-gray-400"
+              className="max-h-28 flex-1 resize-none rounded-xl border border-gray-300 bg-white p-2.5 text-sm text-gray-800 outline-none ring-0 focus:border-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:focus:border-gray-500"
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
                   e.preventDefault();
@@ -324,7 +311,7 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
             <button
               onClick={handleSend}
               disabled={sending || !input.trim()}
-              className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-gray-900 px-3 text-sm font-medium text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-300 bg-gray-800 px-3 text-sm font-medium text-gray-100 hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-60 dark:border-gray-600 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
             >
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-send">
                 <path d="m22 2-7 20-4-9-9-4Z" />
@@ -332,7 +319,7 @@ function ChatSheet({ isOpen, onClose, deviceId, setUnread, setConnection }: { is
               </svg>
             </button>
           </div>
-          <div className="mt-1 text-[10px] text-gray-500">Informational purposes only · WHO ruleset v1.3</div>
+          <div className="mt-1 text-[10px] text-gray-500 dark:text-gray-400">Informational purposes only · WHO ruleset v1.3</div>
         </div>
       </aside>
     </>
@@ -343,27 +330,27 @@ function ChatMessageItem({ m }: { m: ChatMessage }) {
   const align = m.role === "user" ? "items-end" : "items-start";
   const bubble =
     m.role === "user"
-      ? "bg-gray-900 text-white"
+      ? "bg-sky-600 text-white"
       : m.role === "assistant"
-      ? "bg-gray-100 text-gray-900"
-      : "bg-amber-50 text-amber-900 border border-amber-200";
+      ? "bg-gray-200 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+      : "bg-amber-100 text-amber-800 border border-amber-200 dark:bg-amber-500/20 dark:text-amber-200 dark:border-amber-500/30";
 
   return (
     <div className={`flex flex-col ${align}`}>
       <div className={`max-w-[85%] rounded-2xl px-3.5 py-2 text-sm shadow-sm ${bubble}`}>
         {m.content}
       </div>
-      <span className="mt-1 text-[10px] text-gray-500">{timeShort(m.ts)}</span>
+      <span className="mt-1 text-[10px] text-gray-500 dark:text-gray-400">{timeShort(m.ts)}</span>
     </div>
   );
 }
 
 function TypingIndicator() {
   return (
-    <div className="flex items-center gap-2 text-xs text-gray-500">
-      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.2s]" />
-      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400" />
-      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.2s]" />
+    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:-0.2s] dark:bg-gray-500" />
+      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400 dark:bg-gray-500" />
+      <span className="inline-flex h-2 w-2 animate-bounce rounded-full bg-gray-400 [animation-delay:0.2s] dark:bg-gray-500" />
       <span>Assistant is typing…</span>
     </div>
   );
@@ -376,14 +363,14 @@ function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
     "Compare current pH to limits",
   ];
   return (
-    <div className="mx-auto mt-10 max-w-sm text-center text-sm text-gray-500">
-      <div className="mb-3 text-gray-700">No messages yet</div>
+    <div className="mx-auto mt-10 max-w-sm text-center text-sm text-gray-500 dark:text-gray-400">
+      <div className="mb-3 text-gray-800 dark:text-gray-200">No messages yet</div>
       <div className="flex flex-wrap justify-center gap-2">
         {suggestions.map((s) => (
           <button
             key={s}
             onClick={() => onPick(s)}
-            className="rounded-full border border-gray-200 bg-white px-3 py-1 text-xs text-gray-700 hover:bg-gray-50"
+            className="rounded-full border border-gray-300 bg-gray-100/50 px-3 py-1 text-xs text-gray-600 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700/50 dark:text-gray-300 dark:hover:bg-gray-700"
           >
             {s}
           </button>
@@ -396,7 +383,7 @@ function ChatEmptyState({ onPick }: { onPick: (text: string) => void }) {
 function IconButton({ label, disabled, onClick, children }: React.PropsWithChildren<{ label: string; disabled?: boolean; onClick?: () => void }>) {
   return (
     <button
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-gray-300 bg-gray-50/50 text-gray-600 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-gray-300 dark:hover:bg-white/10"
       title={label}
       aria-label={label}
       onClick={onClick}

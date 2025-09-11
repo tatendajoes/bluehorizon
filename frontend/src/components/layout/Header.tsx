@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Logo from '../ui/Logo';
+import ThemeToggle from '../ui/ThemeToggle';
 
 const Header: React.FC = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -14,26 +15,32 @@ const Header: React.FC = () => {
   }, []);
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
+    <header className="sticky top-0 z-30 bg-white/80 dark:bg-transparent dark:border-b dark:border-white/10 backdrop-blur-sm">
+      <div className="container mx-auto px-4">
+        <div className="flex h-16 items-center justify-between">
           <div className="flex items-center space-x-3">
-            <Logo size="md" className="text-blue-600" />
-            <h1 className="text-xl font-semibold text-gray-900">
+            <Logo size="md" className="text-blue-600 dark:text-sky-400" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
               Blue Horizon
             </h1>
           </div>
           
-          <div className="flex items-center space-x-6">
-            <div className="text-sm text-gray-600">
+          <div className="flex items-center space-x-2 sm:space-x-6 text-sm text-gray-600 dark:text-gray-300">
+            <div className="hidden sm:block">
               {currentTime.toLocaleTimeString()}
             </div>
             <div className="flex items-center space-x-2">
-              <div className={`w-2 h-2 rounded-full ${
-                status === 'online' ? 'bg-green-500' : 'bg-red-500'
-              }`} />
-              <span className="text-sm text-gray-600 capitalize">{status}</span>
+              <div className="relative flex h-2 w-2">
+                <div className={`animate-ping absolute inline-flex h-full w-full rounded-full ${
+                  status === 'online' ? 'bg-green-400 opacity-75' : 'bg-red-400 opacity-75'
+                }`} />
+                <div className={`relative inline-flex rounded-full h-2 w-2 ${
+                  status === 'online' ? 'bg-green-500' : 'bg-red-500'
+                }`} />
+              </div>
+              <span className="capitalize hidden sm:inline">{status}</span>
             </div>
+            <ThemeToggle />
           </div>
         </div>
       </div>

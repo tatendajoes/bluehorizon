@@ -1,3 +1,5 @@
+import React from 'react';
+
 export interface DataPoint {
   t: string;
   ph: number;
@@ -33,4 +35,20 @@ export interface WaterQualityThresholds {
     max: number;
     critical: number;
   };
+}
+
+export interface WaterTip {
+  id: string;
+  title: string;
+  description: string;
+  category: 'immediate' | 'maintenance' | 'educational' | 'seasonal';
+  priority: number;
+  actionable: boolean;
+  cost?: string;
+  timeToComplete?: string;
+  relatedParameter?: 'ph' | 'ntu' | 'tds';
+  isCompleted?: boolean;
+  isFavorited?: boolean;
+  reasoning?: string; // AI explanation for why this tip is relevant
+  icon?: React.ReactNode; // Icon component for the tip
 }

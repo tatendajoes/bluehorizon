@@ -9,6 +9,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { useTheme } from "../../contexts/ThemeContext";
 
 // Types for better type safety
 interface DataPoint {
@@ -52,6 +53,7 @@ export default function WaterTrends({
   deviceId = "well-01", 
   refreshInterval 
 }: WaterTrendsProps) {
+  const { theme } = useTheme();
   const [rangeOption, setRangeOption] = useState<'30m' | '1h' | '12h' | '24h' | 'live'>('24h');
   const data = useWaterData();
 
@@ -118,15 +120,15 @@ export default function WaterTrends({
   }, []);
 
   // Prefer a subtle grid color that works for both themes
-  const gridStroke = "rgba(100,116,139,0.2)"; // slate-500 @ 0.2
+  const gridStroke = theme === 'dark' ? "rgba(100,116,139,0.2)" : "rgba(0,0,0,0.1)";
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-white/5 rounded-lg shadow-md dark:shadow-lg dark:backdrop-blur-md border border-gray-200 dark:border-white/10 p-6 text-gray-800 dark:text-gray-300">
       {/* Header */}
       <div className="mb-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Blue Horizon Trends</h3>
-          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-700">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Blue Horizon Trends</h3>
+          <span className="rounded-full bg-gray-100 dark:bg-white/10 px-3 py-1 text-sm text-gray-700 dark:text-gray-300">
             {deviceId}
           </span>
         </div>
@@ -159,41 +161,41 @@ export default function WaterTrends({
           label="pH Level" 
           value={latest?.ph ?? "–"} 
           sublabel="6.5–8.5 optimal" 
-          badgeClass="bg-indigo-600"
+          badgeClass="bg-indigo-500 dark:bg-indigo-400"
           status={latest ? getMetricStatus('ph', latest.ph) : 'ok'}
         />
         <MetricCard 
           label="Turbidity" 
           value={latest ? `${latest.ntu} NTU` : "–"} 
           sublabel="< 5 NTU optimal" 
-          badgeClass="bg-sky-600"
+          badgeClass="bg-sky-500 dark:bg-sky-400"
           status={latest ? getMetricStatus('ntu', latest.ntu) : 'ok'}
         />
         <MetricCard 
           label="Total Dissolved Solids" 
           value={latest ? `${latest.tds} ppm` : "–"} 
           sublabel="200-500 optimal" 
-          badgeClass="bg-violet-600"
+          badgeClass="bg-violet-500 dark:bg-violet-400"
           status={latest ? getMetricStatus('tds', latest.tds) : 'ok'}
         />
       </div>
 
       {/* Combined Area Chart */}
-      <div className="h-80 w-full rounded-xl border border-gray-200 bg-gray-50/50 p-4">
+      <div className="h-80 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 p-4">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={sliced} margin={{ left: 12, right: 12, top: 12, bottom: 12 }}>
             <defs>
               <linearGradient id="phFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#4f46e5" stopOpacity={0.3} />
-                <stop offset="95%" stopColor="#4f46e5" stopOpacity={0.02} />
+                <stop offset="5%" stopColor={theme === 'dark' ? '#818cf8' : '#4f46e5'} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={theme === 'dark' ? '#818cf8' : '#4f46e5'} stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="ntuFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#0284c7" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#0284c7" stopOpacity={0.02} />
+                <stop offset="5%" stopColor={theme === 'dark' ? '#7dd3fc' : '#0ea5e9'} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={theme === 'dark' ? '#7dd3fc' : '#0ea5e9'} stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="tdsFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#7c3aed" stopOpacity={0.25} />
-                <stop offset="95%" stopColor="#7c3aed" stopOpacity={0.02} />
+                <stop offset="5%" stopColor={theme === 'dark' ? '#a78bfa' : '#7c3aed'} stopOpacity={0.25} />
+                <stop offset="95%" stopColor={theme === 'dark' ? '#a78bfa' : '#7c3aed'} stopOpacity={0.02} />
               </linearGradient>
             </defs>
             <CartesianGrid stroke={gridStroke} strokeDasharray="3 3" />
@@ -201,26 +203,26 @@ export default function WaterTrends({
               dataKey="t"
               tickFormatter={timeShort}
               minTickGap={24}
-              stroke="#64748b"
-              tick={{ fontSize: 12, fill: "#64748b" }}
+              stroke={theme === 'dark' ? "#94a3b8" : "#6b7280"}
+              tick={{ fontSize: 12, fill: theme === 'dark' ? "#94a3b8" : "#6b7280" }}
             />
             <YAxis
               yAxisId="left"
               orientation="left"
-              stroke="#64748b"
-              tick={{ fontSize: 12, fill: "#64748b" }}
+              stroke={theme === 'dark' ? "#94a3b8" : "#6b7280"}
+              tick={{ fontSize: 12, fill: theme === 'dark' ? "#94a3b8" : "#6b7280" }}
               tickFormatter={(v) => `${v}`}
               width={40}
             />
             <Tooltip content={<ChartTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 13, color: "#64748b" }} />
+            <Legend wrapperStyle={{ fontSize: 13, color: theme === 'dark' ? "#94a3b8" : "#4b5563" }} />
 
             <Area
               yAxisId="left"
               type="monotone"
               name="pH"
               dataKey="ph"
-              stroke="#4f46e5" // indigo-600
+              stroke={theme === 'dark' ? '#818cf8' : '#4f46e5'} // indigo-400 / indigo-600
               strokeWidth={2}
               fill="url(#phFill)"
               dot={false}
@@ -231,7 +233,7 @@ export default function WaterTrends({
               type="monotone"
               name="Turbidity (NTU)"
               dataKey="ntu"
-              stroke="#0284c7" // sky-600
+              stroke={theme === 'dark' ? '#7dd3fc' : '#0ea5e9'} // sky-300 / sky-500
               strokeWidth={2}
               fill="url(#ntuFill)"
               dot={false}
@@ -242,7 +244,7 @@ export default function WaterTrends({
               type="monotone"
               name="TDS (ppm)"
               dataKey="tds"
-              stroke="#7c3aed" // violet-600
+              stroke={theme === 'dark' ? '#a78bfa' : '#7c3aed'} // violet-400 / violet-600
               strokeWidth={2}
               fill="url(#tdsFill)"
               dot={false}
@@ -253,7 +255,7 @@ export default function WaterTrends({
       </div>
 
       {/* Enhanced footer with data info */}
-      <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+      <div className="mt-4 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
         <span>{sliced.length} data points</span>
         <span>Updated {timeShort(latest?.t || new Date().toISOString())}</span>
       </div>
@@ -275,8 +277,8 @@ function RangeChip({ active, onClick, children, isLive = false }: RangeChipProps
       className={
         "rounded-full border px-3 py-1.5 text-sm font-medium transition-colors relative " +
         (active
-          ? "border-gray-900 bg-gray-900 text-white hover:bg-gray-800"
-          : "border-gray-200 bg-white text-gray-700 hover:bg-gray-50")
+          ? "border-gray-400 dark:border-white/20 bg-gray-200 dark:bg-white/10 text-gray-900 dark:text-white hover:bg-gray-300 dark:hover:bg-white/20"
+          : "border-gray-300 dark:border-white/10 bg-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5")
       }
     >
       {children}
@@ -302,39 +304,40 @@ function MetricCard({
   label, 
   value, 
   sublabel, 
-  badgeClass = "bg-gray-600",
+  badgeClass = "bg-gray-400",
   status = 'ok'
 }: MetricCardProps) {
   const statusColors = {
-    ok: 'text-green-600',
-    warning: 'text-amber-600',
-    high: 'text-red-600',
-    low: 'text-blue-600'
+    ok: 'text-gray-800 dark:text-green-400',
+    warning: 'text-amber-600 dark:text-amber-400',
+    high: 'text-red-600 dark:text-red-400',
+    low: 'text-blue-600 dark:text-blue-400'
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4 shadow-sm">
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-medium text-gray-600">{label}</span>
+        <span className="text-sm font-medium text-gray-500 dark:text-gray-400">{label}</span>
         <span className={`h-2 w-2 rounded-full ${badgeClass}`}></span>
       </div>
-      <div className={`text-2xl font-bold ${status === 'ok' ? 'text-gray-900' : statusColors[status]}`}>
+      <div className={`text-2xl font-bold ${status === 'ok' ? 'text-gray-900 dark:text-gray-100' : statusColors[status]}`}>
         {value}
       </div>
-      {sublabel && <div className="text-xs text-gray-500 mt-1">{sublabel}</div>}
+      {sublabel && <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{sublabel}</div>}
     </div>
   );
 }
 
 function ChartTooltip({ active, payload, label }: any) {
+  const { theme } = useTheme();
   if (!active || !payload || !payload.length) return null;
   const date = new Date(label);
   return (
-    <div className="rounded-lg border border-gray-200 bg-white/95 p-3 text-sm shadow-lg backdrop-blur">
-      <div className="mb-2 font-semibold text-gray-700">{timeMed(date)}</div>
+    <div className="rounded-lg border border-gray-300 dark:border-white/10 bg-white/80 dark:bg-gray-800/80 p-3 text-sm shadow-lg backdrop-blur">
+      <div className="mb-2 font-semibold text-gray-800 dark:text-gray-200">{timeMed(date)}</div>
       <div className="space-y-1">
         {payload.map((p: any) => (
-          <div key={p.dataKey} className="flex items-center justify-between gap-6 text-gray-700">
+          <div key={p.dataKey} className="flex items-center justify-between gap-6 text-gray-700 dark:text-gray-300">
             <span className="flex items-center gap-2">
               <span className="inline-block h-3 w-3 rounded-full" style={{ background: p.stroke }} />
               <span className="text-sm">{p.name}</span>

@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { AlertTriangle, CheckCircle, Lightbulb, TrendingUp, DollarSign, Clock } from "lucide-react";
 import { useActions } from "../../contexts/ActionContext";
+import { useTheme } from "../../contexts/ThemeContext";
 
 // Types from your existing component
 interface DataPoint {
@@ -63,6 +64,7 @@ export default function WaterStatus({
   data: externalData
 }: WaterStatusProps) {
   const { handleGetQuote } = useActions();
+  const { theme } = useTheme();
   const generatedData = useWaterData();
   const data = externalData || generatedData;
   
@@ -241,46 +243,46 @@ export default function WaterStatus({
 
   if (!latest) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-white/5 rounded-lg shadow p-4">
         <div className="text-center py-8">
-          <p className="text-gray-500">No water quality data available</p>
+          <p className="text-gray-500 dark:text-gray-400">No water quality data available</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="bg-white dark:bg-white/5 rounded-2xl shadow-lg dark:shadow-lg dark:backdrop-blur-md border border-gray-200 dark:border-white/10 text-gray-800 dark:text-gray-300">
       {/* Overall Status Card */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="p-4 md:p-6">
         {/* Status Header */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className={`h-2.5 w-2.5 rounded-full ${
-                overallStatus.color === 'green' ? 'bg-green-500' :
-                overallStatus.color === 'blue' ? 'bg-blue-500' :
-                overallStatus.color === 'amber' ? 'bg-amber-500 animate-pulse' :
-                'bg-red-500 animate-pulse'
+                overallStatus.color === 'green' ? 'bg-green-500 dark:bg-green-400' :
+                overallStatus.color === 'blue' ? 'bg-blue-500 dark:bg-sky-400' :
+                overallStatus.color === 'amber' ? 'bg-amber-500 dark:bg-amber-400 animate-pulse' :
+                'bg-red-500 dark:bg-red-400 animate-pulse'
               }`}></div>
-              <h3 className="text-lg font-semibold text-gray-900">Water Status</h3>
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Water Status</h3>
             </div>
             <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${
-              overallStatus.color === 'green' ? 'bg-green-100 text-green-700' :
-              overallStatus.color === 'blue' ? 'bg-blue-100 text-blue-700' :
-              overallStatus.color === 'amber' ? 'bg-amber-100 text-amber-700' :
-              'bg-red-100 text-red-700'
+              overallStatus.color === 'green' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-300' :
+              overallStatus.color === 'blue' ? 'bg-blue-100 text-blue-700 dark:bg-sky-500/20 dark:text-sky-300' :
+              overallStatus.color === 'amber' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300' :
+              'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-300'
             }`}>
               {overallStatus.label}
             </span>
           </div>
           <div className="text-right">
-            <div className="text-xs text-gray-500">Overall Score</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">Overall Score</div>
             <div className={`text-xl font-bold ${
-              overallStatus.color === 'green' ? 'text-green-600' :
-              overallStatus.color === 'blue' ? 'text-blue-600' :
-              overallStatus.color === 'amber' ? 'text-amber-600' :
-              'text-red-600'
+              overallStatus.color === 'green' ? 'text-green-600 dark:text-green-400' :
+              overallStatus.color === 'blue' ? 'text-blue-600 dark:text-sky-400' :
+              overallStatus.color === 'amber' ? 'text-amber-600 dark:text-amber-400' :
+              'text-red-600 dark:text-red-400'
             }`}>
               {overallScore}/10
             </div>
@@ -288,14 +290,14 @@ export default function WaterStatus({
         </div>
 
         {/* AI Summary */}
-        <div className="rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 p-4 mb-4">
+        <div className="rounded-xl bg-blue-50 dark:bg-black/20 border border-blue-100 dark:border-white/10 p-4 mb-4">
           <div className="flex items-start gap-3">
-            <div className="h-6 w-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Lightbulb className="h-3 w-3 text-blue-600" />
+            <div className="h-6 w-6 rounded-full bg-blue-100 dark:bg-sky-500/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+              <Lightbulb className="h-3 w-3 text-blue-600 dark:text-sky-300" />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900 mb-2">AI Analysis</h3>
-              <p className="text-sm text-gray-700 leading-relaxed">
+              <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">AI Analysis</h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                 {aiSummary}
               </p>
             </div>
@@ -305,42 +307,42 @@ export default function WaterStatus({
         {/* Issues Breakdown */}
         {issues.length > 0 && (
           <div className="space-y-3 mb-4">
-            <h3 className="font-medium text-gray-900 mb-2">Current Issues</h3>
+            <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Current Issues</h3>
             
             {issues.map((issue, index) => (
               <div key={index} className={`flex items-start gap-3 p-3 rounded-lg border ${
-                issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'border-red-100 bg-red-50' :
-                issue.severity === 'warning' ? 'border-amber-100 bg-amber-50' :
-                issue.severity === 'high' ? 'border-red-100 bg-red-50' :
-                'border-blue-100 bg-blue-50'
+                issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'border-red-100 bg-red-50 dark:border-red-500/30 dark:bg-red-500/10' :
+                issue.severity === 'warning' ? 'border-amber-100 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10' :
+                issue.severity === 'high' ? 'border-red-100 bg-red-50 dark:border-red-500/30 dark:bg-red-500/10' :
+                'border-blue-100 bg-blue-50 dark:border-sky-500/30 dark:bg-sky-500/10'
               }`}>
                 <div className={`h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'bg-red-100' :
-                  issue.severity === 'warning' ? 'bg-amber-100' :
-                  issue.severity === 'high' ? 'bg-red-100' :
-                  'bg-blue-100'
+                  issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'bg-red-100 dark:bg-red-500/20' :
+                  issue.severity === 'warning' ? 'bg-amber-100 dark:bg-amber-500/20' :
+                  issue.severity === 'high' ? 'bg-red-100 dark:bg-red-500/20' :
+                  'bg-blue-100 dark:bg-sky-500/20'
                 }`}>
                   <AlertTriangle className={`h-2.5 w-2.5 ${
-                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-600' :
-                    issue.severity === 'warning' ? 'text-amber-600' :
-                    issue.severity === 'high' ? 'text-red-600' :
-                    'text-blue-600'
+                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-600 dark:text-red-300' :
+                    issue.severity === 'warning' ? 'text-amber-600 dark:text-amber-300' :
+                    issue.severity === 'high' ? 'text-red-600 dark:text-red-300' :
+                    'text-blue-600 dark:text-sky-300'
                   }`} />
                 </div>
                 <div>
                   <h4 className={`font-medium text-sm ${
-                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-900' :
-                    issue.severity === 'warning' ? 'text-amber-900' :
-                    issue.severity === 'high' ? 'text-red-900' :
-                    'text-blue-900'
+                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-900 dark:text-red-200' :
+                    issue.severity === 'warning' ? 'text-amber-900 dark:text-amber-200' :
+                    issue.severity === 'high' ? 'text-red-900 dark:text-red-200' :
+                    'text-blue-900 dark:text-sky-200'
                   }`}>
                     {issue.title} ({issue.current}{issue.type === 'ph' ? '' : issue.type === 'ntu' ? ' NTU' : ' ppm'})
                   </h4>
                   <p className={`text-xs mt-0.5 ${
-                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-700' :
-                    issue.severity === 'warning' ? 'text-amber-700' :
-                    issue.severity === 'high' ? 'text-red-700' :
-                    'text-blue-700'
+                    issue.severity === 'warning' && issue.type === 'ph' && issue.current < 6.5 ? 'text-red-700 dark:text-red-300' :
+                    issue.severity === 'warning' ? 'text-amber-700 dark:text-amber-300' :
+                    issue.severity === 'high' ? 'text-red-700 dark:text-red-300' :
+                    'text-blue-700 dark:text-sky-300'
                   }`}>
                     {issue.description}. Optimal range: {issue.optimal}
                   </p>
@@ -352,13 +354,13 @@ export default function WaterStatus({
 
         {/* Good Status */}
         {issues.length === 0 && (
-          <div className="flex items-start gap-3 p-3 rounded-lg border border-green-100 bg-green-50 mb-4">
-            <div className="h-5 w-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-              <CheckCircle className="h-2.5 w-2.5 text-green-600" />
+          <div className="flex items-start gap-3 p-3 rounded-lg border border-green-100 bg-green-50 dark:border-green-500/30 dark:bg-green-500/10 mb-4">
+            <div className="h-5 w-5 rounded-full bg-green-100 dark:bg-green-500/20 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="h-2.5 w-2.5 text-green-600 dark:text-green-300" />
             </div>
             <div>
-              <h4 className="font-medium text-sm text-green-900">All Parameters Normal</h4>
-              <p className="text-xs text-green-700 mt-0.5">
+              <h4 className="font-medium text-sm text-green-900 dark:text-green-200">All Parameters Normal</h4>
+              <p className="text-xs text-green-700 dark:text-green-300 mt-0.5">
                 pH, turbidity, and TDS levels are within optimal ranges.
               </p>
             </div>
@@ -367,31 +369,31 @@ export default function WaterStatus({
 
         {/* Recommendations */}
         <div className="space-y-3">
-          <h3 className="font-medium text-gray-900 mb-2">Recommended Actions</h3>
+          <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Recommended Actions</h3>
           
           <div className="space-y-2">
             {recommendations.slice(0, 3).map((rec, index) => (
-              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50">
+              <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 bg-gray-50 dark:border-white/10 dark:bg-black/20">
                 <div className={`h-5 w-5 rounded-full flex items-center justify-center flex-shrink-0 font-bold text-xs text-white ${
-                  rec.type === 'immediate' ? 'bg-red-600' :
-                  rec.type === 'short-term' ? 'bg-amber-600' :
-                  'bg-blue-600'
+                  rec.type === 'immediate' ? 'bg-red-500' :
+                  rec.type === 'short-term' ? 'bg-amber-500' :
+                  'bg-blue-500 dark:bg-sky-500'
                 }`}>
                   {rec.priority}
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-sm text-gray-900">{rec.title}</h4>
-                  <p className="text-xs text-gray-600 mt-0.5">
+                  <h4 className="font-medium text-sm text-gray-900 dark:text-gray-100">{rec.title}</h4>
+                  <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5">
                     {rec.description}
                   </p>
                   <div className="flex items-center gap-3 mt-1.5">
                     <div className="flex items-center gap-1">
-                      <DollarSign className="h-3 w-3 text-gray-400" />
-                      <span className="text-xs text-gray-500">{rec.cost}</span>
+                      <DollarSign className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{rec.cost}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-gray-400" />
-                      <span className="text-xs text-gray-500">{rec.timeline}</span>
+                      <Clock className="h-3 w-3 text-gray-400 dark:text-gray-500" />
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{rec.timeline}</span>
                     </div>
                   </div>
                 </div>
@@ -401,17 +403,17 @@ export default function WaterStatus({
         </div>
 
         {/* Footer */}
-        <div className="mt-4 pt-3 border-t border-gray-200 flex items-center justify-between">
-          <div className="text-[10px] text-gray-500">
+        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-white/10 flex items-center justify-between">
+          <div className="text-[10px] text-gray-500 dark:text-gray-400">
             Last updated: {timeShort(latest.t)}
           </div>
           <div className="flex items-center gap-2">
-            <button className="text-[10px] text-blue-600 hover:text-blue-700 font-medium">
+            <button className="text-[10px] text-blue-600 dark:text-sky-400 hover:text-blue-700 dark:hover:text-sky-300 font-medium">
               Export Report
             </button>
             <button 
               onClick={handleGetQuote}
-              className="bg-blue-600 text-white px-2 py-1 rounded-md text-[10px] font-medium hover:bg-blue-700 transition-colors"
+              className="bg-blue-600 text-white dark:bg-sky-600 px-2 py-1 rounded-md text-[10px] font-medium hover:bg-blue-700 dark:hover:bg-sky-700 transition-colors"
             >
               Get Quote
             </button>
