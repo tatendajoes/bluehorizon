@@ -1,0 +1,279 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2025-09-14T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "req_001",
+      "parentId": "fld_trends",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/WQ-001?range=24h",
+      "name": "Get 24h Trends",
+      "description": "Fetch water quality trends for the last 24 hours",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649600000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_002",
+      "parentId": "fld_trends",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/WQ-001?range=7d",
+      "name": "Get 7d Trends",
+      "description": "Fetch water quality trends for the last 7 days",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649500000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_003",
+      "parentId": "fld_trends",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/WQ-001?range=30d",
+      "name": "Get 30d Trends",
+      "description": "Fetch water quality trends for the last 30 days",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649400000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_004",
+      "parentId": "fld_trends",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/WQ-001",
+      "name": "Get Default Range (24h)",
+      "description": "Test default range when no range parameter is provided",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649300000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_005",
+      "parentId": "fld_error_tests",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/WQ-001?range=invalid",
+      "name": "Invalid Range Parameter",
+      "description": "Test error handling for invalid range parameter",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649200000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_006",
+      "parentId": "fld_error_tests",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/api/trends/NONEXISTENT-DEVICE",
+      "name": "Non-existent Device",
+      "description": "Test response for device that doesn't exist",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": -1694649100000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "req_007",
+      "parentId": "fld_health",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "url": "{{ _.base_url }}/",
+      "name": "Health Check",
+      "description": "Verify the API server is running",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [],
+      "authentication": {},
+      "metaSortKey": -1694649000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global",
+      "_type": "request"
+    },
+    {
+      "_id": "fld_trends",
+      "parentId": "wrk_main",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "📈 Trends API",
+      "description": "Water quality trends endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1694649600000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_error_tests",
+      "parentId": "wrk_main",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "❌ Error Handling",
+      "description": "Test error scenarios and edge cases",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1694649500000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "fld_health",
+      "parentId": "wrk_main",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "🏥 Health Checks",
+      "description": "Server health and status endpoints",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": -1694649400000,
+      "_type": "request_group"
+    },
+    {
+      "_id": "wrk_main",
+      "parentId": null,
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "Blue Horizon API Tests",
+      "description": "Comprehensive test suite for Blue Horizon Water Quality API",
+      "scope": "collection",
+      "_type": "workspace"
+    },
+    {
+      "_id": "env_base",
+      "parentId": "wrk_main",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:3001"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url"]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1694649600000,
+      "_type": "environment"
+    },
+    {
+      "_id": "env_prod",
+      "parentId": "wrk_main",
+      "modified": 1694649600000,
+      "created": 1694649600000,
+      "name": "Production",
+      "data": {
+        "base_url": "https://your-api.railway.app"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url"]
+      },
+      "color": "#FF6B6B",
+      "isPrivate": false,
+      "metaSortKey": 1694649700000,
+      "_type": "environment"
+    }
+  ]
+}

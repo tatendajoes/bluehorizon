@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from "react";
+import React, { useMemo, useState, useCallback, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -24,17 +24,23 @@ interface WaterTrendsProps {
   refreshInterval?: number;
 }
 
-// Custom hook for data generation
+// Configuration from environment variables
+const USE_BACKEND = process.env.REACT_APP_USE_BACKEND === 'true';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+
+// Custom hook for mock data generation (fallback)
 function useWaterData() {
   return useMemo(() => {
     const now = Date.now();
     const points: DataPoint[] = [];
-    const stepMs = 30 * 60 * 1000; // 30 minutes
-    const total = (24 * 60 * 60 * 1000) / stepMs;
+    
+    // Generate 30 days of data with 2-hour intervals
+    const stepMs = 2 * 60 * 60 * 1000; // 2 hours
+    const total = (30 * 24 * 60 * 60 * 1000) / stepMs; // 30 days worth
 
     for (let i = total; i >= 0; i--) {
       const ts = new Date(now - i * stepMs);
-      const base = Math.sin((i / total) * Math.PI * 2) * 0.3; // gentle daily wave
+      const base = Math.sin((i / total) * Math.PI * 4) * 0.3; // gentle waves over time
       const ph = clamp(7.1 + base * 0.5 + noise(0.05), 6.6, 8.4);
       const ntu = clamp(1.2 + (base + 0.2) * 1.4 + noise(0.25), 0.2, 8.5);
       const tds = clamp(240 + (base + 0.1) * 40 + noise(6), 160, 680);
@@ -49,28 +55,138 @@ function useWaterData() {
   }, []);
 }
 
+// Custom hook for backend data fetching
+function useBackendData(deviceId: string, rangeOption: string) {
+  const [data, setData] = useState<DataPoint[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Map frontend range options to backend range format
+  const getBackendRange = (range: string) => {
+    switch (range) {
+      case '7d':
+        return '7d';
+      case '30d':
+        return '30d'; 
+      case '90d':
+        return '30d'; // Backend doesn't support 90d yet, use 30d
+      case '24h':
+        return '24h';
+      case 'live':
+        return '24h'; // Use 24h data for live view
+      default:
+        return '24h';
+    }
+  };
+
+  const fetchData = useCallback(async () => {
+    if (!USE_BACKEND) {
+      console.log('[WaterTrends] Backend disabled, using mock data');
+      return;
+    }
+    
+    console.log(`[WaterTrends] Fetching data for device: ${deviceId}, range: ${rangeOption}`);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const backendRange = getBackendRange(rangeOption);
+      const url = `${API_URL}/api/trends/${deviceId}?range=${backendRange}`;
+      console.log(`[WaterTrends] API Request: ${url}`);
+      
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      
+      const result = await response.json();
+      console.log(`[WaterTrends] API Response:`, {
+        dataPoints: result.data?.length || 0,
+        deviceId: result.deviceId,
+        range: result.range,
+        timeSpan: rangeOption === '7d' ? '7 days' : rangeOption === '30d' ? '30 days' : rangeOption === '90d' ? '90 days' : rangeOption === '24h' ? '24 hours' : 'live',
+        hasError: !!result.error
+      });
+
+      if (result.data) {
+        // Transform backend data to frontend format
+        // Backend returns: {t, ph, ntu, tds, temp, do}
+        // Frontend expects: {t, ph, ntu, tds}
+        const transformedData: DataPoint[] = result.data.map((item: any) => ({
+          t: item.t,
+          ph: round2(item.ph),
+          ntu: round2(item.ntu),
+          tds: Math.round(item.tds)
+        }));
+        
+        console.log(`[WaterTrends] Successfully transformed ${transformedData.length} data points`);
+        setData(transformedData);
+      } else {
+        throw new Error(result.error || 'Failed to fetch data');
+      }
+    } catch (err) {
+      console.error('[WaterTrends] Backend fetch failed:', {
+        error: err instanceof Error ? err.message : 'Unknown error',
+        deviceId,
+        rangeOption,
+        apiUrl: API_URL,
+        fallback: 'Using mock data'
+      });
+      setError(err instanceof Error ? err.message : 'Unknown error');
+      // Don't set data here - let component fall back to mock data
+    } finally {
+      setLoading(false);
+    }
+  }, [deviceId, rangeOption]);
+
+  useEffect(() => {
+    if (USE_BACKEND) {
+      fetchData();
+    }
+  }, [fetchData]);
+
+  return { data, loading, error, refetch: fetchData };
+}
+
 export default function WaterTrends({ 
   deviceId = "well-01", 
   refreshInterval 
 }: WaterTrendsProps) {
   const { theme } = useTheme();
-  const [rangeOption, setRangeOption] = useState<'30m' | '1h' | '12h' | '24h' | 'live'>('24h');
-  const data = useWaterData();
+  const [rangeOption, setRangeOption] = useState<'7d' | '30d' | '90d' | '24h' | 'live'>('24h');
+  
+  // Get mock data as fallback
+  const mockData = useWaterData();
+  
+  // Get backend data when enabled
+  const { data: backendData, loading, error, refetch } = useBackendData(deviceId, rangeOption);
+  
+  // Use backend data if available and not in error state, otherwise use mock data
+  const data = USE_BACKEND && backendData.length > 0 && !error ? backendData : mockData;
+  
+  // Log data source for debugging
+  useEffect(() => {
+    const dataSource = USE_BACKEND 
+      ? (backendData.length > 0 && !error ? 'backend' : 'mock (backend failed)')
+      : 'mock (backend disabled)';
+    console.log(`[WaterTrends] Data source: ${dataSource}, points: ${data.length}`);
+  }, [data, backendData, error]);
 
   const sliced = useMemo(() => {
     let cutoffMs;
     switch (rangeOption) {
-      case '30m':
-        cutoffMs = 30 * 60 * 1000;
+      case '7d':
+        cutoffMs = 7 * 24 * 60 * 60 * 1000; // 7 days
         break;
-      case '1h':
-        cutoffMs = 60 * 60 * 1000;
+      case '30d':
+        cutoffMs = 30 * 24 * 60 * 60 * 1000; // 30 days
         break;
-      case '12h':
-        cutoffMs = 12 * 60 * 60 * 1000;
+      case '90d':
+        cutoffMs = 90 * 24 * 60 * 60 * 1000; // 90 days
         break;
       case '24h':
-        cutoffMs = 24 * 60 * 60 * 1000;
+        cutoffMs = 24 * 60 * 60 * 1000; // 24 hours
         break;
       case 'live':
         cutoffMs = 3 * 60 * 60 * 1000; // Show last 3 hours for live view
@@ -86,22 +202,32 @@ export default function WaterTrends({
   const latest = sliced.at(-1) ?? data.at(-1);
 
   // Auto-refresh for live mode
-  React.useEffect(() => {
+  useEffect(() => {
     if (rangeOption === 'live') {
       const interval = setInterval(() => {
-        // In a real app, this would trigger a data refresh
-        // For now, we'll just force a re-render by updating the key
-        window.location.hash = Date.now().toString();
+        if (USE_BACKEND && refetch) {
+          refetch(); // Refresh backend data
+        } else {
+          // For mock data, just force a re-render by updating the key
+          window.location.hash = Date.now().toString();
+        }
       }, 30000); // Refresh every 30 seconds
 
       return () => clearInterval(interval);
     }
-  }, [rangeOption]);
+  }, [rangeOption, refetch]);
+
+  // Refresh handler for range changes
+  useEffect(() => {
+    if (USE_BACKEND && refetch) {
+      refetch();
+    }
+  }, [rangeOption, refetch]);
 
   // Memoized handlers for each range option
-  const handleRange30m = useCallback(() => setRangeOption('30m'), []);
-  const handleRange1h = useCallback(() => setRangeOption('1h'), []);
-  const handleRange12h = useCallback(() => setRangeOption('12h'), []);
+  const handleRange7d = useCallback(() => setRangeOption('7d'), []);
+  const handleRange30d = useCallback(() => setRangeOption('30d'), []);
+  const handleRange90d = useCallback(() => setRangeOption('90d'), []);
   const handleRange24h = useCallback(() => setRangeOption('24h'), []);
   const handleRangeLive = useCallback(() => setRangeOption('live'), []);
 
@@ -133,24 +259,24 @@ export default function WaterTrends({
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <RangeChip active={rangeOption === '30m'} onClick={handleRange30m}>
-            30m
-          </RangeChip>
-          <RangeChip active={rangeOption === '1h'} onClick={handleRange1h}>
-            1h
-          </RangeChip>
-          <RangeChip active={rangeOption === '12h'} onClick={handleRange12h}>
-            12h
-          </RangeChip>
-          <RangeChip active={rangeOption === '24h'} onClick={handleRange24h}>
-            24h
-          </RangeChip>
           <RangeChip 
             active={rangeOption === 'live'} 
             onClick={handleRangeLive}
             isLive={true}
           >
             Live
+          </RangeChip>
+          <RangeChip active={rangeOption === '24h'} onClick={handleRange24h}>
+            24h
+          </RangeChip>
+          <RangeChip active={rangeOption === '7d'} onClick={handleRange7d}>
+            7d
+          </RangeChip>
+          <RangeChip active={rangeOption === '30d'} onClick={handleRange30d}>
+            30d
+          </RangeChip>
+          <RangeChip active={rangeOption === '90d'} onClick={handleRange90d}>
+            90d
           </RangeChip>
         </div>
       </div>
